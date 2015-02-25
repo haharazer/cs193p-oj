@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UILabel *actionDescLabel;
+@property (weak, nonatomic) IBOutlet UISlider *actionDescribeSlider;
 
 @property (nonatomic) NSUInteger matchNum;
 
@@ -58,6 +59,9 @@
     }
     self.scoreLabel.text = [NSString stringWithFormat:@"score: %d", (int)self.game.score];
     self.actionDescLabel.text = [self.game.actionDescribeArray lastObject];
+    self.actionDescribeSlider.maximumValue = [self.game.actionDescribeArray count] - 1;
+    self.actionDescLabel.alpha = 1;
+    self.actionDescribeSlider.value = 0;
 }
 
 - (NSString *)titleForCard:(Card *)card
@@ -98,8 +102,20 @@
     self.game = [[CardMatchingGame alloc] initWithCardCount:[self.cardButtons count]usingDeck:[self createDeck] usingMatchNum:self.matchNum];
 }
 
-- (IBAction)slider:(UISlider *)sender {
-    
+- (IBAction)slider:(UISlider *)sender
+{
+    NSUInteger descIndex = [self.game.actionDescribeArray count] - sender.value - 1;
+    if ([self.game.actionDescribeArray objectAtIndex:descIndex]) {
+        self.actionDescLabel.text = [self.game.actionDescribeArray objectAtIndex:descIndex];
+    }
+    if (sender.value != 0)
+    {
+        self.actionDescLabel.alpha = 0.5;
+    }
+    else
+    {
+        self.actionDescLabel.alpha = 1;
+    }
 }
 
 @end
