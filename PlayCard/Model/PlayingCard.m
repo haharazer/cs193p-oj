@@ -69,10 +69,10 @@
         }
     }
     if (rankEqual) {
-        score += 4;
+        score += 1;
     }
     if (suitEqual) {
-        score += 16;
+        score += 4;
     }
     return score;
 }

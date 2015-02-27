@@ -7,6 +7,7 @@
 //
 
 #import "CardMatchingGame.h"
+#import "ActionDescription.h"
 
 @interface CardMatchingGame()
 @property (nonatomic, readwrite) NSInteger score;
@@ -90,7 +91,7 @@ static const int COST_TO_CHOSE = 1;
         }
         else
         {
-            NSString *actionDesc = @"";
+            ActionDescription *actionDesc = [[ActionDescription alloc] init];
             [self.chosenCards addObject:card];
             if ([self.chosenCards count] == self.matchNum + 1) {
                 Card *firstObject = [self.chosenCards firstObject];
@@ -99,36 +100,33 @@ static const int COST_TO_CHOSE = 1;
             }
             if ([self.chosenCards count] == self.matchNum)
             {
+                actionDesc.isMatchAction = YES;
+                actionDesc.cards = self.chosenCards;
                 NSInteger matchScore = [card match:self.chosenCards];
                 if (matchScore)
                 {
                     NSInteger points = matchScore * MATCH_BONUS;
                     self.score += points;
-                    actionDesc = @"Matched ";
+                    
                     for (Card *chosenCard in self.chosenCards)
                     {
                         chosenCard.matched = YES;
-                        actionDesc = [actionDesc stringByAppendingString:chosenCard.contents];
-                        actionDesc = [actionDesc stringByAppendingString:@" "];
                     }
-                    actionDesc = [actionDesc stringByAppendingFormat:@"for %d points.", (int)points];
+                    actionDesc.matched = YES;
+                    actionDesc.points = points;
                     self.chosenCards = [[NSMutableArray alloc] init];
                 }
                 else
                 {
                     self.score -= MISMATCH_PENALTY;
-                    actionDesc = @"";
-                    for (Card *chosenCard in self.chosenCards)
-                    {
-                        actionDesc = [actionDesc stringByAppendingString:chosenCard.contents];
-                        actionDesc = [actionDesc stringByAppendingString:@" "];
-                    }
-                    actionDesc = [actionDesc stringByAppendingFormat:@"don’t match! %d point penalty!", MISMATCH_PENALTY];
+                    actionDesc.matched = NO;
+                    actionDesc.points = MISMATCH_PENALTY;
                 }
             }
             else
             {
-                actionDesc = card.contents;
+                actionDesc.isMatchAction = NO;
+                actionDesc.cards = @[card];
             }
             self.score -= COST_TO_CHOSE;
             card.chosen = YES;
@@ -136,6 +134,7 @@ static const int COST_TO_CHOSE = 1;
         }
     }
 }
+
 
 - (Card *)cardAtIndex:(NSUInteger)index
 {
